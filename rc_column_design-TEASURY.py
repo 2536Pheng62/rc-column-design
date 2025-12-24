@@ -221,7 +221,7 @@ def plot_column_section(
         n_bars_y: Number of bars along depth (h)
         stirrup_spacing_m: Stirrup spacing (m)
         stirrup_bar_name: Stirrup bar designation (e.g., "RB9")
-        main_bar_name: Strain bar designation (e.g., "DB20")
+        main_bar_name: Main bar designation (e.g., "DB20")
     
     Returns:
         Matplotlib Figure object
@@ -1412,38 +1412,6 @@ def main():
     
     st.title("🏗️ Rectangular Reinforced Concrete Column Design")
     st.markdown("**Based on Thai Engineering Standards (ACI 318 Metric)**")
-    st.markdown("**Developed by: A.THONGCHART**")
-    
-    # Legal Disclaimer / ข้อเสนอแนะตามหลักกฎหมาย
-    with st.expander("⚠️ ข้อจำกัดความรับผิดชอบ / Disclaimer", expanded=False):
-        st.warning("""
-        **ข้อจำกัดความรับผิดชอบ (Disclaimer)**
-        
-        🔸 โปรแกรมนี้เป็นเครื่องมือช่วยในการคำนวณเบื้องต้นเท่านั้น ไม่สามารถใช้แทนการตัดสินใจทางวิศวกรรมโดยผู้เชี่ยวชาญได้
-        
-        🔸 ผู้ใช้งานต้องมีพื้นฐานความรู้ด้านวิศวกรรมโครงสร้างและการออกแบบคอนกรีตเสริมเหล็กตามมาตรฐาน ACI 318
-        
-        🔸 การคำนวณและการออกแบบทั้งหมดเป็นความรับผิดชอบของผู้ใช้งานแต่เพียงผู้เดียว
-        
-        🔸 ผู้พัฒนาไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการใช้งานโปรแกรมนี้
-        
-        🔸 ผลการคำนวณควรได้รับการตรวจสอบโดยวิศวกรโยธาที่มีใบอนุญาตประกอบวิชาชีพ (กว.) ก่อนนำไปใช้งานจริง
-        
-        ---
-        
-        **Legal Disclaimer**
-        
-        🔸 This program is intended as a preliminary calculation tool only and cannot replace engineering judgment by qualified professionals.
-        
-        🔸 Users must have fundamental knowledge in structural engineering and reinforced concrete design according to ACI 318 standards.
-        
-        🔸 All calculations and designs are the sole responsibility of the user.
-        
-        🔸 The developer is not liable for any damages arising from the use of this program.
-        
-        🔸 Calculation results should be verified by a licensed civil engineer before actual implementation.
-        """)
-    
     st.markdown("---")
     
     # =========================================================================
@@ -2081,7 +2049,7 @@ def main():
                 fontsize=9, color='darkred',
                 arrowprops=dict(arrowstyle='->', color='darkred', lw=1))
     
-    # Maximum moment point marker
+    # Max moment point marker
     max_Mn_tonm = phi_Mn_tonm[max_Mn_idx]
     max_Pn_ton = phi_Pn_ton[max_Mn_idx]
     ax.plot(max_Mn_tonm, max_Pn_ton, 'g^', markersize=10, 
@@ -2143,7 +2111,8 @@ def main():
                     xy=(Mu_tonm, Pu_ton),
                     xytext=(30, 30), textcoords='offset points',
                     fontsize=10, fontweight='bold', color=marker_color,
-                    bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor=marker_color),
+                    bbox=dict(boxstyle='round,pad=0.5', facecolor='white', 
+                             edgecolor=marker_color, alpha=0.9),
                     arrowprops=dict(arrowstyle='->', color=marker_color, lw=2))
     
     # Axis labels (English only for font compatibility)
@@ -2291,18 +2260,17 @@ def main():
             'φMn (Ton·m)': phi_Mn_tonm,
         })
         
-        # Format the dataframe for display
-        df_display = df.copy()
-        df_display['c (mm)'] = df_display['c (mm)'].apply(lambda x: f'{x:.1f}')
-        df_display['εt'] = df_display['εt'].apply(lambda x: f'{x:.5f}')
-        df_display['φ'] = df_display['φ'].apply(lambda x: f'{x:.3f}')
-        df_display['Pn (kN)'] = df_display['Pn (kN)'].apply(lambda x: f'{x:.1f}')
-        df_display['Mn (kN·m)'] = df_display['Mn (kN·m)'].apply(lambda x: f'{x:.2f}')
-        df_display['φPn (kN)'] = df_display['φPn (kN)'].apply(lambda x: f'{x:.1f}')
-        df_display['φMn (kN·m)'] = df_display['φMn (kN·m)'].apply(lambda x: f'{x:.2f}')
-        df_display['φPn (Ton)'] = df_display['φPn (Ton)'].apply(lambda x: f'{x:.2f}')
-        df_display['φMn (Ton·m)'] = df_display['φMn (Ton·m)'].apply(lambda x: f'{x:.3f}')
-        st.table(df_display)
+        st.dataframe(df.style.format({
+            'c (mm)': '{:.1f}',
+            'εt': '{:.5f}',
+            'φ': '{:.3f}',
+            'Pn (kN)': '{:.1f}',
+            'Mn (kN·m)': '{:.2f}',
+            'φPn (kN)': '{:.1f}',
+            'φMn (kN·m)': '{:.2f}',
+            'φPn (Ton)': '{:.2f}',
+            'φMn (Ton·m)': '{:.3f}',
+        }), use_container_width=True)
     
     # Show rebar layer details
     with st.expander("🔩 View Rebar Layer Details"):
@@ -2317,12 +2285,11 @@ def main():
             })
         
         df_layers = pd.DataFrame(layers_data)
-        # Format the dataframe for display
-        df_layers_display = df_layers.copy()
-        df_layers_display['Distance from top (mm)'] = df_layers_display['Distance from top (mm)'].apply(lambda x: f'{x:.1f}')
-        df_layers_display['Area (mm²)'] = df_layers_display['Area (mm²)'].apply(lambda x: f'{x:.1f}')
-        df_layers_display['Number of bars equiv.'] = df_layers_display['Number of bars equiv.'].apply(lambda x: f'{x:.1f}')
-        st.table(df_layers_display)
+        st.dataframe(df_layers.style.format({
+            'Distance from top (mm)': '{:.1f}',
+            'Area (mm²)': '{:.1f}',
+            'Number of bars equiv.': '{:.1f}'
+        }), use_container_width=True)
     
     # =========================================================================
     # PDF EXPORT SECTION
@@ -2504,8 +2471,6 @@ def main():
         "phi_Pn_max_ton": pm_results['phi_Pn_max'] / TON_TO_N,
         "phi_Pnt_ton": pm_results['phi_Pnt'] / TON_TO_N,
         "beta1": pm_results['beta1'],
-        "As_total": pm_results['As_total'],
-        "rebar_layers": pm_results['rebar_layers'],
     }
     
     # Display stored values for debugging (can be removed in production)
